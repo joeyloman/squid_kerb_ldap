@@ -1,0 +1,1242 @@
+dnl This program is free software; you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+dnl
+dnl Process this file with autoconf to produce a configure script.
+
+
+AC_INIT([squid_kerb_ldap],[1.2.2],[markus_moeller@compuserve.com])
+AM_INIT_AUTOMAKE(squid_kerb_ldap,1.2.2)
+
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_EGREP
+
+AC_TRY_COMPILE([int main()
+  { 
+     return; 
+  } 
+])
+
+SPARCV9=""
+sys=`uname`
+case $sys in
+         Linux) w_flag="-Wl,-R"
+                w_flag_2=""
+		;;
+         AIX) w_flag="-Wl,-blibpath:"
+              w_flag_2=":/usr/lib:/lib"
+              ;;
+         SunOS) w_flag="-R"
+                w_flag_2=""
+		rel=`uname -r`
+		case $rel in
+         		5.10|5.11) AC_DEFINE(HAVE_NEW_SEAM_KERBEROS,1,[Define to 1 if you have New Solaris 10/OpenSolaris Kerberos])
+                  		;;
+         		*) ;;
+		esac
+                ;;
+         FreeBSD) w_flag="-Wl,-R"
+                w_flag_2=""
+		;;
+         *) w_flag="-Wl,-rpath"
+            w_flag_2=""
+            ;;
+esac
+
+AC_CHECK_SIZEOF(short)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long)
+
+enable_arg="no"
+check_mit() {
+       if test "x$ac_krb5_config" = "xyes" ; then
+           ac_heimdal=`krb5-config --version 2>/dev/null | grep heimdal`
+           if test "x$ac_heimdal" != "x" ; then
+               check_heimdal
+               return
+           fi
+       fi
+       AC_DEFINE(HAVE_MIT_KERBEROS,1,[Define to 1 if you have MIT Kerberos])
+       ac_gss_libs="resolv com_err des425 k5crypto krb5 gssapi_krb5"
+       ac_includedir=""
+       ac_libdir=""
+       case $sys in
+	        Linux) if test "x$enableval" != "xyes" -a "x$enableval" != "x" ; then
+                         ac_libdir=$enableval/lib
+                         ac_includedir=$enableval/include
+                       else
+                         ac_libdir=`rpm -q -l  krb5 2>/dev/null | grep "/libgssapi_krb5" |  sed -e 's/\/libgssapi_krb5.*//' | head -1`
+                         ac_includedir=`rpm -q -l krb5-devel 2>/dev/null | grep /krb5.h$ | sed -e 's/\/krb5.h//' | head -1`
+                       fi
+                       if test "x$ac_includedir" != "x" ; then
+                         CPPFLAGS="$CPPFLAGS -I$ac_includedir"
+                       else
+                         ac_gssapi_cflags=`krb5-config --cflags gssapi 2>/dev/null`
+                         if test "x$ac_gssapi_cflags" != "x" ; then
+                           CPPFLAGS="$CPPFLAGS $ac_gssapi_cflags"
+                         fi
+                       fi
+                       AC_CHECK_HEADERS(krb5.h com_err.h gssapi.h gssapi/gssapi.h gssapi/gssapi_krb5.h gssapi/gssapi_generic.h)
+                       if test "x$ac_libdir" != "x" ; then
+                         LDFLAGS="$LDFLAGS -L$ac_libdir $w_flag$ac_libdir$w_flag_2"
+                         for lib in $ac_gss_libs; do
+                           AC_CHECK_LIB($lib,main)
+                         done
+                       else
+                         ac_gssapi_libs=`krb5-config --libs gssapi 2>/dev/null`
+                         if test "x$ac_gssapi_libs" != "x" ; then
+                           LDFLAGS="$LDFLAGS $ac_gssapi_libs"
+                         else
+                           for lib in $ac_gss_libs; do
+                             AC_CHECK_LIB($lib,main)
+                           done
+                         fi
+                       fi
+                       ;;
+                *) if test "x$enableval" != "xyes" -a "x$enableval" != "x" ; then
+                     ac_libdir=$enableval/lib
+                     ac_includedir=$enableval/include
+                     CPPFLAGS="$CPPFLAGS -I$ac_includedir"
+                     AC_CHECK_HEADERS(krb5.h com_err.h gssapi.h gssapi/gssapi.h gssapi/gssapi_krb5.h gssapi/gssapi_generic.h)
+                     LDFLAGS="$LDFLAGS -L$ac_libdir $w_flag$ac_libdir$w_flag_2"
+                     for lib in $ac_gss_libs; do 
+                        AC_CHECK_LIB($lib,main)
+                     done
+                   else
+                     ac_gssapi_cflags=`krb5-config --cflags gssapi 2>/dev/null`
+                     if test "x$ac_gssapi_cflags" != "x" ; then
+                         CPPFLAGS="$CPPFLAGS $ac_gssapi_cflags"
+                     fi
+                     ac_gssapi_libs=`krb5-config --libs gssapi 2>/dev/null`
+                     if test "x$ac_gssapi_libs" != "x" ; then
+                         LDFLAGS="$LDFLAGS $ac_gssapi_libs"
+                     else
+                         for lib in $ac_gss_libs; do
+                            AC_CHECK_LIB($lib,main)
+                         done
+                     fi
+                     AC_CHECK_HEADERS(krb5.h com_err.h gssapi.h gssapi/gssapi.h gssapi/gssapi_krb5.h gssapi/gssapi_generic.h)
+                   fi
+                   ;;
+       esac
+       AC_CHECK_DECLS(krb5_kt_free_entry,,,[#include <krb5.h>])
+       LIBS_sav=$LIBS
+       AC_CHECK_LIB(krb5,krb5_kt_free_entry,AC_DEFINE(HAVE_KRB5_KT_FREE_ENTRY,1,[Define to 1 if you have krb5_kt_free_entry]),)
+       AC_CHECK_LIB(krb5,krb5_get_init_creds_keytab,AC_DEFINE(HAVE_GET_INIT_CREDS_KEYTAB,1,[Define to 1 if you have krb5_get_init_creds_keytab]),)
+       AC_TRY_RUN([
+#include<krb5.h>
+  main()
+  {
+    krb5_context context;
+    krb5_ccache cc;
+
+    krb5_init_context(&context);
+    return krb5_cc_resolve(context, "MEMORY:test_cache", &cc);
+  }],AC_DEFINE(HAVE_KRB5_MEMORY_CACHE,1, [Define to 1 if you have MEMORY: cache support]),)
+       LIBS=$LIBS_sav
+       enable_arg="mit"
+}
+check_heimdal(){
+       if test "x$ac_krb5_config" = "xyes" ; then
+           ac_heimdal=`krb5-config --version 2>/dev/null | grep heimdal`
+           if test "x$ac_heimdal" = "x" ; then
+               check_mit
+               return
+           fi
+       fi
+       AC_DEFINE(HAVE_HEIMDAL_KERBEROS,1,[Define to 1 if you have Heimdal Kerberos])
+       ac_gss_libs="resolv crypto des crypt roken com_err asn1 krb5 gssapi"
+       ac_includedir=""
+       ac_libdir=""
+       case $sys in
+	        Linux) if test "x$enableval" != "xyes" -a "x$enableval" != "x" ; then
+                         ac_libdir=$enableval/lib
+                         ac_includedir=$enableval/include
+                       else
+                         ac_libdir=`rpm -q -l  heimdal-devel 2>/dev/null | grep "/libroken" |  sed -e 's/\/libroken.*//' | head -1`
+                         ac_includedir=`rpm -q -l heimdal-devel 2>/dev/null | grep /krb5.h$ | sed -e 's/\/krb5.h//' | head -1`
+                       fi
+                       if test "x$ac_includedir" != "x" ; then
+                          CPPFLAGS="$CPPFLAGS -I$ac_includedir"
+                       else
+                         ac_gssapi_cflags=`krb5-config --cflags gssapi 2>/dev/null`
+                         if test "x$ac_gssapi_cflags" != "x" ; then
+                           CPPFLAGS="$CPPFLAGS $ac_gssapi_cflags"
+                         fi
+                       fi
+                       AC_CHECK_HEADERS(krb5.h com_err.h gssapi.h gssapi/gssapi.h gssapi/gssapi_krb5.h gssapi/gssapi_generic.h)
+                       if test "x$ac_libdir" != "x" ; then
+                          LDFLAGS="$LDFLAGS -L$ac_libdir $w_flag$ac_libdir$w_flag_2"
+                         for lib in $ac_gss_libs; do
+                           AC_CHECK_LIB($lib,main)
+                         done
+                       else
+                         ac_gssapi_libs=`krb5-config --libs gssapi 2>/dev/null`
+                         if test "x$ac_gssapi_libs" != "x" ; then
+                           ac_libdir=`echo $ac_gssapi_libs | grep "\-L"`
+                           if test "x$ac_libdir" != "x" ; then
+                             ac_libdir=`echo $ac_gssapi_libs | sed -e 's/.*-L//' | sed -e 's/ .*//'`
+                             LDFLAGS="$LDFLAGS $w_flag$ac_libdir$w_flag_2"
+                           fi
+                           LDFLAGS="$LDFLAGS $ac_gssapi_libs"
+                         else
+                           for lib in $ac_gss_libs; do
+                             AC_CHECK_LIB($lib,main)
+                           done
+                         fi
+                       fi
+                       ;;
+                *) if test "x$enableval" != "xyes" -a "x$enableval" != "x" ; then
+                     ac_libdir=$enableval/lib
+                     ac_includedir=$enableval/include
+                     CPPFLAGS="$CPPFLAGS -I$ac_includedir"
+                     AC_CHECK_HEADERS(krb5.h com_err.h gssapi.h gssapi/gssapi.h gssapi/gssapi_krb5.h gssapi/gssapi_generic.h)
+                     LDFLAGS="$LDFLAGS -L$ac_libdir $w_flag$ac_libdir$w_flag_2"
+                     for lib in $ac_gss_libs; do
+                        AC_CHECK_LIB($lib,main)
+                     done
+                   else
+                     ac_gssapi_cflags=`krb5-config --cflags gssapi 2>/dev/null`
+                     if test "x$ac_gssapi_cflags" != "x" ; then
+                         CPPFLAGS="$CPPFLAGS $ac_gssapi_cflags"
+                     fi
+                     ac_gssapi_libs=`krb5-config --libs gssapi 2>/dev/null`
+                     if test "x$ac_gssapi_libs" != "x" ; then
+                         ac_libdir=`echo $ac_gssapi_libs | grep "\-L"`
+                         if test "x$ac_libdir" != "x" ; then
+                           ac_libdir=`echo $ac_gssapi_libs | sed -e 's/.*-L//' | sed -e 's/ .*//'`
+                           LDFLAGS="$LDFLAGS $w_flag$ac_libdir$w_flag_2"
+                         fi
+                         LDFLAGS="$LDFLAGS $ac_gssapi_libs"
+                     else
+                         for lib in $ac_gss_libs; do
+                            AC_CHECK_LIB($lib,main)
+                         done
+                     fi
+                     AC_CHECK_HEADERS(krb5.h com_err.h gssapi.h gssapi/gssapi.h gssapi/gssapi_krb5.h gssapi/gssapi_generic.h)
+                   fi
+                   ;;
+       esac
+       AC_CHECK_DECLS(krb5_kt_free_entry,,,[#include <krb5.h>])
+       LIBS_sav=$LIBS
+       AC_CHECK_LIB(krb5,krb5_kt_free_entry,AC_DEFINE(HAVE_KRB5_KT_FREE_ENTRY,1,[Define to 1 if you have krb5_kt_free_entry]),)
+       AC_CHECK_LIB(krb5,krb5_get_init_creds_keytab,AC_DEFINE(HAVE_GET_INIT_CREDS_KEYTAB,1,[Define to 1 if you have krb5_get_init_creds_keytab]),)
+       AC_TRY_RUN([
+#include<krb5.h>
+  main()
+  {
+    krb5_context context;
+    krb5_ccache cc;
+
+    krb5_init_context(&context);
+    return krb5_cc_resolve(context, "MEMORY:test_cache", &cc);
+  }],AC_DEFINE(HAVE_KRB5_MEMORY_CACHE,1, [Define to 1 if you have MEMORY: cache support]),)
+       LIBS=$LIBS_sav
+       enable_arg="heimdal"
+}
+check_nas(){
+       AC_DEFINE(HAVE_NAS_KERBEROS,1,[Define to 1 if you have NAS Kerberos])
+       AC_CHECK_HEADERS(krb5.h com_err.h gssapi.h gssapi/gssapi.h gssapi/gssapi_krb5.h gssapi/gssapi_generic.h)
+       LDFLAGS="$LDFLAGS -L/usr/lib"
+       ac_gss_libs="krb5 gssapi_krb5 ksvc";
+       for lib in $ac_gss_libs; do
+          AC_CHECK_LIB($lib,main)
+       done       
+       AC_CHECK_DECLS(krb5_kt_free_entry,,,[#include <krb5.h>])
+       LIBS_sav=$LIBS
+       LIBS=$ac_gss_libs
+       AC_CHECK_LIB(krb5,krb5_kt_free_entry,AC_DEFINE(HAVE_KRB5_KT_FREE_ENTRY,1,[Define to 1 if you have krb5_kt_free_entry]),)
+       AC_CHECK_LIB(krb5,krb5_get_init_creds_keytab,AC_DEFINE(HAVE_GET_INIT_CREDS_KEYTAB,1,[Define to 1 if you have krb5_get_init_creds_keytab]),)
+       AC_TRY_RUN([
+#include<krb5.h>
+  main()
+  {
+    krb5_context context;
+    krb5_ccache cc;
+
+    krb5_init_context(&context);
+    return krb5_cc_resolve(context, "MEMORY:test_cache", &cc);
+  }],AC_DEFINE(HAVE_KRB5_MEMORY_CACHE,1, [Define to 1 if you have MEMORY: cache support]),)
+       LIBS=$LIBS_sav
+       enable_arg="nas"
+}
+
+check_seam_64(){
+       SPARCV9s="/sparcv9"
+       check_seam
+       enable_arg="seam64"
+}
+
+check_seam(){
+       AC_DEFINE(HAVE_SEAM_KERBEROS,1,[Define to 1 if you have SEAM Kerberos])
+       AC_DEFINE(HAVE_DECL_KRB5_KT_FREE_ENTRY,1,[Define to 1 if you have krb5_kt_free_entry declaration])
+       CPPFLAGS="$CPPFLAGS -I/usr/include/kerberosv5"
+       AC_CHECK_HEADERS(krb5.h com_err.h gssapi.h gssapi/gssapi.h gssapi/gssapi_krb5.h gssapi/gssapi_generic.h)
+       ac_sol_libs="nsl socket resolv"
+       for lib in $ac_sol_libs; do
+          AC_CHECK_LIB($lib,main)
+       done
+       ac_gss_libs="-lgss"
+       if test -e /usr/lib/gss/do${SPARCV9s}/mech_krb5.so ; then
+         ln -s /usr/lib/gss/do${SPARCV9s}/mech_krb5.so /tmp/libmech_krb5.so;
+         LIBS_sav=$LIBS
+         LDFLAGS_sav=$LDFLAGS;
+         LDFLAGS="-L/tmp";
+         AC_CHECK_LIB(mech_krb5,main)
+         AC_CHECK_LIB(mech_krb5,krb5_kt_free_entry,AC_DEFINE(HAVE_KRB5_KT_FREE_ENTRY,1,[Define to 1 if you have krb5_kt_free_entry]),)
+         AC_CHECK_LIB(mech_krb5,krb5_get_init_creds_keytab,AC_DEFINE(HAVE_GET_INIT_CREDS_KEYTAB,1,[Define to 1 if you have krb5_get_init_creds_keytab]),)
+         LDFLAGS=$LDFLAGS_sav
+         LIBS=$LIBS_sav
+         if test "x$ac_cv_lib_mech_krb5_main" = "xyes" ; then
+           LDFLAGS="$LDFLAGS -R/usr/lib/gss/do${SPARCV9s}" 
+           ac_gss_libs="$ac_gss_libs /usr/lib/gss/do${SPARCV9s}/mech_krb5.so"
+         fi
+         rm /tmp/libmech_krb5.so
+       elif test -e /usr/lib/gss/gl${SPARCV9s}/mech_krb5.so ; then
+         ln -s /usr/lib/gss/gl${SPARCV9s}/mech_krb5.so /tmp/libmech_krb5.so;
+         LIBS_sav=$LIBS
+         LDFLAGS_sav=$LDFLAGS;
+         LDFLAGS="-L/tmp";
+         AC_CHECK_LIB(mech_krb5,main)
+         AC_CHECK_LIB(mech_krb5,krb5_kt_free_entry,AC_DEFINE(HAVE_KRB5_KT_FREE_ENTRY,1,[Define to 1 if you have krb5_kt_free_entry]),)
+         AC_CHECK_LIB(mech_krb5,krb5_get_init_creds_keytab,AC_DEFINE(HAVE_GET_INIT_CREDS_KEYTAB,1,[Define to 1 if you have krb5_get_init_creds_keytab]),)
+         LDFLAGS=$LDFLAGS_sav
+         LIBS=$LIBS_sav
+         if test "x$ac_cv_lib_mech_krb5_main" = "xyes" ; then
+           LDFLAGS="$LDFLAGS -R/usr/lib/gss/gl${SPARCV9s}" 
+           ac_gss_libs="$ac_gss_libs /usr/lib/gss/dl${SPARCV9s}/mech_krb5.so"
+         fi
+         rm /tmp/libmech_krb5.so
+       else
+         ln -s /usr/lib/gss${SPARCV9s}/mech_krb5.so /tmp/libmech_krb5.so;
+         LIBS_sav=$LIBS
+         LDFLAGS_sav=$LDFLAGS;
+         LDFLAGS="-L/tmp";
+         AC_CHECK_LIB(mech_krb5,main)
+         AC_CHECK_LIB(mech_krb5,krb5_kt_free_entry,AC_DEFINE(HAVE_KRB5_KT_FREE_ENTRY,1,[Define to 1 if you have krb5_kt_free_entry]),)
+         AC_CHECK_LIB(mech_krb5,krb5_get_init_creds_keytab,AC_DEFINE(HAVE_GET_INIT_CREDS_KEYTAB,1,[Define to 1 if you have krb5_get_init_creds_keytab]),)
+         LDFLAGS=$LDFLAGS_sav
+         LIBS=$LIBS_sav
+         if test "x$ac_cv_lib_mech_krb5_main" = "xyes" ; then
+           LDFLAGS="$LDFLAGS -R/usr/lib/gss${SPARCV9s}" 
+           ac_gss_libs="$ac_gss_libs /usr/lib/gss${SPARCV9s}/mech_krb5.so"
+         fi
+         rm /tmp/libmech_krb5.so
+       fi
+       LIBS="$ac_gss_libs $LIBS"
+       AC_TRY_RUN([
+#ifdef HAVE_KRB5_H
+#include <krb5.h>
+#else
+#if defined(__STDC__) || defined(__cplusplus) || defined(HAS_VOID_TYPE)
+#define KRB5_PROTOTYPE(x) x
+typedef void * krb5_pointer;
+#else
+#define KRB5_PROTOTYPE(x) x
+typedef char * krb5_pointer;
+#endif
+#if defined(KRB5_NO_NESTED_PROTOTYPES) || (defined(__ultrix) && !defined(__GNUC__))
+#define KRB5_NPROTOTYPE(x) ()
+#else
+#define KRB5_NPROTOTYPE(x) KRB5_PROTOTYPE(x)
+#endif
+#if ($ac_cv_sizeof_int == 4)
+typedef int             krb5_int32;
+typedef unsigned int    krb5_ui_4;
+#define VALID_INT_BITS    0x7fffffff
+#define VALID_UINT_BITS   0xffffffff
+#elif ($ac_cv_sizeof_long == 4)
+typedef long    krb5_int32;
+typedef unsigned long   krb5_ui_4;
+#elif ($ac_cv_sizeof_short == 4)
+typedef short   krb5_int32;
+typedef unsigned short  krb5_ui_4;
+#else
+ ?== error: undefined 32 bit type
+#endif
+typedef krb5_int32      krb5_error_code;
+typedef krb5_error_code krb5_magic;
+
+struct _krb5_context;
+typedef struct _krb5_context * krb5_context;
+
+typedef struct _krb5_ccache {
+    krb5_magic magic;
+    struct _krb5_cc_ops *ops;
+    krb5_pointer data;
+} *krb5_ccache;
+
+#ifndef KRB5_CALLCONV
+#define KRB5_CALLCONV
+#endif
+typedef struct _krb5_cc_ops {
+    krb5_magic magic;
+    char *prefix;
+    char * (KRB5_CALLCONV *get_name) ();
+    krb5_error_code (KRB5_CALLCONV *resolve) ();
+    krb5_error_code (KRB5_CALLCONV *gen_new) ();
+    krb5_error_code (KRB5_CALLCONV *init) ();
+    krb5_error_code (KRB5_CALLCONV *destroy) ();
+    krb5_error_code (KRB5_CALLCONV *close) ();
+    krb5_error_code (KRB5_CALLCONV *store) ();
+    krb5_error_code (KRB5_CALLCONV *retrieve) ();
+    krb5_error_code (KRB5_CALLCONV *get_princ) ();
+    krb5_error_code (KRB5_CALLCONV *get_first) ();
+    krb5_error_code (KRB5_CALLCONV *get_next) ();
+    krb5_error_code (KRB5_CALLCONV *end_get) ();
+    krb5_error_code (KRB5_CALLCONV *remove_cred) ();
+    krb5_error_code (KRB5_CALLCONV *set_flags) ();
+} krb5_cc_ops;
+
+krb5_error_code KRB5_CALLCONV krb5_init_context
+        KRB5_PROTOTYPE((krb5_context *));
+
+krb5_error_code KRB5_CALLCONV krb5_cc_resolve
+        KRB5_PROTOTYPE((krb5_context,
+                   const char *,
+                   krb5_ccache * ));
+#endif
+
+int  main()
+  {
+    krb5_context context;
+    krb5_ccache cc;
+
+    krb5_init_context(&context);
+    return krb5_cc_resolve(context, "MEMORY:test_cache", &cc);
+  }],AC_DEFINE(HAVE_KRB5_MEMORY_CACHE,1, [Define to 1 if you have MEMORY: cache support]),)
+       enable_arg="seam"
+}
+
+dnl Define MIT libraries
+AC_ARG_ENABLE(mit,
+  [  --enable-mit[=DIR]	  enable use of MIT package (default=yes) ],
+  [
+    if test "x$enableval" != "xno" ; then
+       check_mit
+    fi ])
+
+dnl Define Heimdal libraries
+AC_ARG_ENABLE(heimdal,
+  [  --enable-heimdal[=DIR]	  enable use of Heimdal package (default=no) ],
+  [
+    if test "x$enableval" != "xno" ; then
+       check_heimdal
+    fi ])
+
+dnl Define NAS libraries
+AC_ARG_ENABLE(nas,
+  [  --enable-nas 		  enable use of NAS(AIX) package (default=no) ],
+  [
+    if test "x$enableval" != "xno" ; then
+       check_nas
+    fi ])
+
+dnl Define SEAM libraries
+AC_ARG_ENABLE(seam,
+  [  --enable-seam[=SRC]	  enable use of SEAM(Solaris) package (default=no) ],
+  [
+    if test "x$enableval" != "xno" ; then
+       check_seam
+    fi ])
+
+dnl Define SEAM libraries
+AC_ARG_ENABLE(seam-64,
+  [  --enable-seam-64[=SRC]	  enable use of 64bit SEAM(Solaris) package (default=no) ],
+  [
+    if test "x$enableval" != "xno" ; then
+       check_seam_64
+    fi ])
+
+dnl Define system default
+if test "$enable_arg" = "no"; then
+  dnl Autodetect system
+  dnl Check krb5-config first
+  AC_CHECK_PROG(ac_krb5_config,krb5-config,yes,no)
+  case $sys in
+           Linux) rpm -q heimdal-lib >/dev/null 2>&1
+                  if test $? == 0 ; then
+                    check_heimdal
+		  else 
+		    check_mit
+                  fi 
+                  ;;
+           AIX)   lslpp -L krb5.client.rte >/dev/null 2>&1
+                  if test $? == 0 ; then
+                    check_nas
+		  else 
+		    check_mit
+                  fi
+                  ;;
+           SunOS) pkginfo SUNWgss >/dev/null 2>&1
+                  if test $? == 0 ; then
+                    check_seam
+		  else 
+		    check_mit
+                  fi
+                  ;;
+           FreeBSD) check_heimdal
+                    ;;
+           *) check_mit
+              ;;
+  esac
+
+fi
+
+with_arg="no"
+check_ldap() {
+       sys=`uname`
+       ac_ldap_libs="lber ldap"
+       ac_ldap_includedir=""
+       ac_ldap_libdir=""
+       if test "x$withval" != "xyes" -a "x$withval" != "x" ; then
+         ac_ldap_libdir=$withval/lib
+         ac_ldap_includedir=$withval/include
+       else
+         if test "x$sys" = "xFreeBSD" ; then
+           ac_ldap_libdir=/usr/local/lib
+           ac_ldap_includedir=/usr/local/include
+         fi
+       fi
+       if test "x$ac_ldap_includedir" != "x" ; then
+         CPPFLAGS="$CPPFLAGS -I$ac_ldap_includedir"
+       fi
+       AC_CHECK_HEADERS(ldap.h lber.h)
+       if test "x$ac_ldap_libdir" != "x" ; then
+         LDFLAGS="$LDFLAGS -L$ac_ldap_libdir $w_flag$ac_ldap_libdir$w_flag_2"
+       fi
+       for lib in $ac_ldap_libs ; do
+         AC_CHECK_LIB($lib,main)
+       done
+dnl
+dnl Check for LDAP_OPT_DEBUG_LEVEL
+dnl
+       AC_EGREP_CPP(YES_OPT_DEBUG_LEVEL,[#include <ldap.h>
+#ifdef LDAP_OPT_DEBUG_LEVEL
+YES_OPT_DEBUG_LEVEL
+#endif],ac_cv_ldap_opt_debug_level="yes",ac_cv_ldap_opt_debug_level="no")
+       if test "x$ac_cv_lib_lber_main" != "xyes" -a "x$ac_cv_lib_lber___main" != "xyes" -a "x$ac_cv_ldap_opt_debug_level" = "xno" ; then
+         AC_DEFINE(HAVE_SUN_LDAP_SDK,1,[Define to 1 if you have Sun ldap sdk])
+       fi
+dnl
+dnl Check for LDAP_REBINDPROC_CALLBACK
+dnl
+       AC_EGREP_HEADER(LDAP_REBINDPROC_CALLBACK,ldap.h,AC_DEFINE(HAVE_LDAP_REBINDPROC_CALLBACK,1,[Define to 1 if you have LDAP_REBINDPROC_CALLBACK]))
+dnl
+dnl Check for LDAP_REBIND_PROC
+dnl
+       AC_EGREP_HEADER(LDAP_REBIND_PROC,ldap.h,AC_DEFINE(HAVE_LDAP_REBIND_PROC,1,[Define to 1 if you have LDAP_REBIND_PROC]))
+dnl
+dnl Check for LDAP_REBIND_FUNCTION
+dnl
+       AC_EGREP_CPP(LDAP_REBIND_FUNCTION,[#define LDAP_REFERRALS
+#include <ldap.h>],AC_DEFINE(HAVE_LDAP_REBIND_FUNCTION,1,[Define to 1 if you have LDAP_REBIND_FUNCTION]))
+dnl
+dnl Check for LDAP_OPT_X_TLS_CACERTFILE assume it is OpenLDAP
+dnl
+       AC_EGREP_CPP(YES_OPT_X_TLS_CACERTFILE,[#include <ldap.h>
+#ifdef LDAP_OPT_X_TLS_CACERTFILE
+YES_OPT_X_TLS_CACERTFILE
+#endif],AC_DEFINE(HAVE_OPENLDAP,1,[Define to 1 if you have Openldap]), )
+dnl
+dnl Check for LDAP_SCOPE_DEFAULT
+dnl
+       AC_EGREP_CPP(YES_SCOPE_DEFAULT,[#include <ldap.h>
+#ifdef LDAP_SCOPE_DEFAULT
+YES_SCOPE_DEFAULT
+#endif],AC_DEFINE(HAVE_LDAP_SCOPE_DEFAULT,1,[Define to 1 if you have LDAP_SCOPE_DEFAULT]))
+dnl
+dnl Check for ldap_url_desc.lud_scheme
+dnl
+       AC_CHECK_MEMBER(struct ldap_url_desc.lud_scheme,AC_DEFINE(HAVE_LDAP_URL_LUD_SCHEME,1,[Define to 1 if you have LDAPURLDesc.lud_scheme]),,[#include <ldap.h>])
+       LIB_sav=$LIB
+dnl
+dnl Check for ldapssl_client_init
+dnl
+       AC_CHECK_LIB(ldap,ldapssl_client_init,AC_DEFINE(HAVE_LDAPSSL_CLIENT_INIT,1,[Define to 1 if you have ldapssl_client_init]),)
+dnl
+dnl Check for ldap_url_desc2str
+dnl
+       AC_CHECK_LIB(ldap,ldap_url_desc2str,AC_DEFINE(HAVE_LDAP_URL_DESC2STR,1,[Define to 1 if you have ldap_url_desc2str]),)
+dnl
+dnl Check for ldap_url_parse
+dnl
+       AC_CHECK_LIB(ldap,ldap_url_parse,AC_DEFINE(HAVE_LDAP_URL_PARSE,1,[Define to 1 if you have ldap_url_parse]),)
+       LIB=$LIB_sav
+       with_arg="yes"
+}
+
+dnl Define ldap directory
+AC_ARG_WITH(ldap-dir,
+  [  --with-ldap-dir=DIR	  define ldap directory ],
+  [
+    if test "x$withval" != "xno" ; then
+       check_ldap
+    fi ])
+
+if test "$with_arg" = "no" ; then
+  check_ldap
+fi
+
+with_arg="no"
+check_sasl() {
+       ac_sasl_includedir=""
+       if test "x$withval" != "xyes" -a "x$withval" != "x" ; then
+         ac_sasl_includedir=$withval
+       fi
+       if test "x$ac_sasl_includedir" != "x" ; then
+         CPPFLAGS="$CPPFLAGS -I$ac_sasl_includedir"
+       fi
+       AC_CHECK_HEADERS(sasl.h sasl/sasl.h)
+       with_arg="yes"
+       sys=`uname`
+       case $sys in
+             Darwin) ac_lib_sav=$LIBS
+                     AC_CHECK_LIB(sasl2,main)
+                     LIBS=$ac_lib_sav
+                     if test "$ac_cv_lib_sasl2_main" = "yes" ; then
+                     AC_DEFINE(HAVE_SASL_DARWIN,1,[Define to 1 if Mac Darwin without sasl.h])
+                        echo "checking for MAC Darwin without sasl.h ... yes"
+                     else
+                        echo "checking for MAC Darwin without sasl.h ... no"
+                     fi
+                     ;;
+       esac
+}
+
+dnl Define sasl include directory
+AC_ARG_WITH(sasl-include,
+  [  --with-sasl-include=DIR          define sasl include directory ],
+  [
+    if test "x$withval" != "xno" ; then
+       check_sasl
+    fi ])
+
+if test "$with_arg" = "no" ; then
+  check_sasl
+fi
+
+AC_CONFIG_HEADER(config.h)
+AH_TOP([/*
+ * -----------------------------------------------------------------------------
+ *
+ * Author: Markus Moeller (|MAIL|)
+ *
+ * Copyright (C) 2007 Markus Moeller. All rights reserved.
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ *
+ *   As a special exemption, M Moeller gives permission to link this program
+ *   with MIT, Heimdal or other GSS/Kerberos libraries, and distribute
+ *   the resulting executable, without including the source code for
+ *   the Libraries in the source distribution.
+ *
+ * -----------------------------------------------------------------------------
+ */
+])
+AH_BOTTOM([
+#ifdef HAVE_HEIMDAL_KERBEROS
+#ifdef HAVE_GSSAPI_GSSAPI_H
+#include <gssapi/gssapi.h>
+#elif defined(HAVE_GSSAPI_H)
+#include <gssapi.h>
+#endif
+#include <krb5.h>
+#ifdef HAVE_COM_ERR_H
+#include <com_err.h>
+#else
+#define error_message(code) krb5_get_err_text(kparam.context,code)
+#endif
+#define gss_nt_service_name GSS_C_NT_HOSTBASED_SERVICE
+#else
+#ifdef HAVE_SEAM_KERBEROS
+#ifdef HAVE_GSSAPI_GSSAPI_H
+#include <gssapi/gssapi.h>
+#elif defined(HAVE_GSSAPI_H)
+#include <gssapi.h>
+#endif
+#ifdef HAVE_GSSAPI_GSSAPI_EXT_H
+#include <gssapi/gssapi_ext.h>
+#endif
+#define gss_nt_service_name GSS_C_NT_HOSTBASED_SERVICE
+#ifdef HAVE_KRB5_H
+/* still testing this for OpenSolaris
+Source includes are located in:
+/usr/src/uts/common/gssapi/mechs/krb5/include/
+and
+/usr/src/lib/gss_mechs/mech_krb5/include
+or
+/usr/include/kerberosv5
+*/
+#include <krb5.h>
+#ifdef HAVE_COM_ERR_H
+#include <com_err.h>
+#endif
+#else /* HAVE_KRB5_H */
+#ifndef KRB5_CONFIG__
+#ifndef KRB5_CALLCONV
+#define KRB5_CALLCONV
+#define KRB5_CALLCONV_C
+#define KRB5_DLLIMP
+#define GSS_DLLIMP
+#define KRB5_EXPORTVAR
+#define NEAR
+#define FAR
+#endif /* !KRB5_CALLCONV */
+#endif /* !KRB5_CONFIG__ */
+
+
+typedef unsigned char   krb5_octet;
+
+#if (SIZEOF_INT == 4)
+typedef int             krb5_int32;
+typedef unsigned int    krb5_ui_4;
+#define VALID_INT_BITS    0x7fffffff
+#define VALID_UINT_BITS   0xffffffff
+#elif (SIZEOF_LONG == 4)
+typedef long    krb5_int32;
+typedef unsigned long   krb5_ui_4;
+#elif (SIZEOF_SHORT == 4)
+typedef short   krb5_int32;
+typedef unsigned short  krb5_ui_4;
+#else
+ ?== error: undefined 32 bit type
+#endif
+
+#if defined(KRB5_NO_CONST) || (defined(__ultrix) && !defined(__GNUC__))
+#define krb5_const
+#else
+#define krb5_const const
+#endif
+
+#if defined(__STDC__) || defined(__cplusplus) || defined(HAS_VOID_TYPE)
+typedef void * krb5_pointer;
+typedef void krb5_const * krb5_const_pointer;
+#else
+typedef char * krb5_pointer;
+typedef char krb5_const * krb5_const_pointer;
+#endif
+
+#if (defined(__STDC__) || defined(__cplusplus) || defined(_MSDOS) || defined(_WIN32) || defined(KRB5_PROVIDE_PROTOTYPES)) && !defined(KRB5_NO_PROTOTYPES)
+#define KRB5_PROTOTYPE(x) x
+#if defined(__STDC__) || defined(__cplusplus) || defined(HAVE_STDARG_H) || defined(_MSDOS) || defined(_WIN32)
+#define KRB5_STDARG_P(x) x
+#else
+#define KRB5_STDARG_P(x) ()
+#endif /* defined(__STDC__) || defined(__cplusplus) || defined(HAVE_STDARG_H) */
+#else
+#define KRB5_PROTOTYPE(x) ()
+#define KRB5_STDARG_P(x) ()
+#endif /* STDC or PROTOTYPES */
+
+/*
+ * This gross compiler dependency is in here because the stock Ultrix
+ * compiler defines __STDC__ but doesn't deal with nested prototypes
+ * properly.  The reason this isn't tested for is so that this header
+ * is actually useful when installed.
+ */
+#if defined(KRB5_NO_NESTED_PROTOTYPES) || (defined(__ultrix) && !defined(__GNUC__))
+#define KRB5_NPROTOTYPE(x) ()
+#else
+#define KRB5_NPROTOTYPE(x) KRB5_PROTOTYPE(x)
+#endif
+
+#define KRB5_NT_UNKNOWN         0
+
+#define KRB5_KT_END                              (-1765328202L)
+
+struct _krb5_context;
+typedef struct _krb5_context * krb5_context;
+
+typedef unsigned int krb5_boolean;
+typedef unsigned int krb5_kvno;
+
+typedef krb5_int32      krb5_authdatatype;
+typedef krb5_int32      krb5_addrtype;
+typedef krb5_int32      krb5_timestamp;
+typedef krb5_int32      krb5_keyusage;
+typedef krb5_int32      krb5_flags;
+typedef krb5_int32      krb5_enctype;
+typedef krb5_int32      krb5_error_code;
+typedef krb5_int32      krb5_deltat;
+typedef krb5_int32      krb5_preauthtype; /* This may change, later on */
+
+typedef krb5_error_code krb5_magic;
+
+typedef struct _krb5_data {
+    krb5_magic magic;
+    unsigned int length;
+    char *data;
+} krb5_data;
+
+typedef krb5_pointer    krb5_cc_cursor; /* cursor for sequential lookup */
+
+struct _krb5_keyblock;
+
+typedef struct _dk_node {
+    krb5_keyusage   usage;
+    struct _krb5_keyblock   *derived_key;
+    uchar_t         dkid; /* derived key identifier byte */
+    struct _dk_node *next;
+} krb5_dk_node;
+
+#ifdef HAVE_NEW_SEAM_KERBEROS
+typedef unsigned long int CK_ULONG;
+typedef CK_ULONG          CK_OBJECT_HANDLE;
+#endif /* HAVE_NEW_SEAM_KERBEROS */
+
+typedef struct _krb5_keyblock {
+    krb5_magic magic;
+    krb5_enctype enctype;
+    unsigned int length;
+    krb5_octet *contents;
+#ifdef HAVE_NEW_SEAM_KERBEROS
+    krb5_dk_node   *dk_list; /* list of keys derived from this key */
+#ifdef _KERNEL
+    crypto_mech_type_t     kef_mt;
+    crypto_key_t           kef_key;
+    crypto_ctx_template_t  key_tmpl;
+#else
+    CK_OBJECT_HANDLE       hKey; /* PKCS#11 key object handle */
+    pid_t       pid; /* fork safety */
+#endif /* _KERNEL */
+#endif /* HAVE_NEW_SEAM_KERBEROS */
+} krb5_keyblock;
+
+typedef struct krb5_principal_data {
+    krb5_magic magic;
+    krb5_data realm;
+    krb5_data *data;            /* An array of strings */
+    krb5_int32 length;
+    krb5_int32 type;
+} krb5_principal_data;
+
+typedef krb5_principal_data * krb5_principal;
+
+typedef krb5_const krb5_principal_data *krb5_const_principal;
+
+typedef struct _krb5_ticket_times {
+    krb5_timestamp authtime; /* XXX ? should ktime in KDC_REP == authtime
+                                in ticket? otherwise client can't get this */
+    krb5_timestamp starttime;           /* optional in ticket, if not present,
+                                           use authtime */
+    krb5_timestamp endtime;
+    krb5_timestamp renew_till;
+} krb5_ticket_times;
+
+/* structure for address */
+typedef struct _krb5_address {
+    krb5_magic magic;
+    krb5_addrtype addrtype;
+    unsigned int length;
+    krb5_octet *contents;
+} krb5_address;
+
+/* structure for auth data */
+typedef struct _krb5_authdata {
+    krb5_magic magic;
+    krb5_authdatatype ad_type;
+    unsigned int length;
+    krb5_octet *contents;
+} krb5_authdata;
+
+/* credentials:  Ticket, session key, etc. */
+typedef struct _krb5_creds {
+    krb5_magic magic;
+    krb5_principal client;              /* client's principal identifier */
+    krb5_principal server;              /* server's principal identifier */
+    krb5_keyblock keyblock;             /* session encryption key info */
+    krb5_ticket_times times;            /* lifetime info */
+    krb5_boolean is_skey;               /* true if ticket is encrypted in
+                                           another ticket's skey */
+    krb5_flags ticket_flags;            /* flags in ticket */
+    krb5_address * *addresses;  /* addrs in ticket */
+    krb5_data ticket;                   /* ticket string itself */
+    krb5_data second_ticket;            /* second ticket, if related to
+                                           ticket (via DUPLICATE-SKEY or
+                                           ENC-TKT-IN-SKEY) */
+    krb5_authdata * *authdata;  /* authorization data */
+} krb5_creds;
+
+typedef struct _krb5_ccache {
+    krb5_magic magic;
+    struct _krb5_cc_ops *ops;
+    krb5_pointer data;
+} *krb5_ccache;
+
+typedef struct _krb5_cc_ops {
+    krb5_magic magic;
+    char *prefix;
+    char * (KRB5_CALLCONV *get_name) KRB5_NPROTOTYPE((krb5_context, krb5_ccache));
+    krb5_error_code (KRB5_CALLCONV *resolve) KRB5_NPROTOTYPE((krb5_context, krb5_ccache *,
+                                            const char *));
+    krb5_error_code (KRB5_CALLCONV *gen_new) KRB5_NPROTOTYPE((krb5_context, krb5_ccache *));
+    krb5_error_code (KRB5_CALLCONV *init) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_principal));
+    krb5_error_code (KRB5_CALLCONV *destroy) KRB5_NPROTOTYPE((krb5_context, krb5_ccache));
+    krb5_error_code (KRB5_CALLCONV *close) KRB5_NPROTOTYPE((krb5_context, krb5_ccache));
+    krb5_error_code (KRB5_CALLCONV *store) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_creds *));
+    krb5_error_code (KRB5_CALLCONV *retrieve) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_flags, krb5_creds *,
+                                            krb5_creds *));
+    krb5_error_code (KRB5_CALLCONV *get_princ) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_principal *));
+    krb5_error_code (KRB5_CALLCONV *get_first) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_cc_cursor *));
+    krb5_error_code (KRB5_CALLCONV *get_next) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_cc_cursor *, krb5_creds *));
+    krb5_error_code (KRB5_CALLCONV *end_get) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_cc_cursor *));
+    krb5_error_code (KRB5_CALLCONV *remove_cred) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_flags, krb5_creds *));
+    krb5_error_code (KRB5_CALLCONV *set_flags) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_flags));
+} krb5_cc_ops;
+
+
+
+typedef krb5_pointer krb5_kt_cursor;    /* XXX */
+
+typedef struct krb5_keytab_entry_st {
+    krb5_magic magic;
+    krb5_principal principal;   /* principal of this key */
+    krb5_timestamp timestamp;   /* time entry written to keytable */
+    krb5_kvno vno;              /* key version number */
+    krb5_keyblock key;          /* the secret key */
+} krb5_keytab_entry;
+
+typedef struct _krb5_kt {
+    krb5_magic magic;
+    struct _krb5_kt_ops *ops;
+    krb5_pointer data;
+} *krb5_keytab;
+
+
+typedef struct _krb5_kt_ops {
+    krb5_magic magic;
+    char *prefix;
+    /* routines always present */
+    krb5_error_code (KRB5_CALLCONV *resolve)
+        (krb5_context,
+                    krb5_const char *,
+                    krb5_keytab *);
+    krb5_error_code (KRB5_CALLCONV *get_name)
+        (krb5_context,
+                    krb5_keytab,
+                    char *,
+                    int);
+    krb5_error_code (KRB5_CALLCONV *close)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab));
+    krb5_error_code (KRB5_CALLCONV *get)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_const_principal,
+                    krb5_kvno,
+                    krb5_enctype,
+                    krb5_keytab_entry *));
+    krb5_error_code (KRB5_CALLCONV *start_seq_get)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_kt_cursor *));
+    krb5_error_code (KRB5_CALLCONV *get_next)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_keytab_entry *,
+                    krb5_kt_cursor *));
+    krb5_error_code (KRB5_CALLCONV *end_get)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_kt_cursor *));
+    /* routines to be included on extended version (write routines) */
+    krb5_error_code (KRB5_CALLCONV *add)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_keytab_entry *));
+    krb5_error_code (KRB5_CALLCONV *remove)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                  krb5_keytab_entry *));
+
+    /* Handle for serializer */
+    void * serializer;
+} krb5_kt_ops;
+
+typedef struct _krb5_get_init_creds_opt {
+    krb5_flags flags;
+    krb5_deltat tkt_life;
+    krb5_deltat renew_life;
+    int forwardable;
+    int proxiable;
+    krb5_enctype *etype_list;
+    int etype_list_length;
+    krb5_address **address_list;
+    krb5_preauthtype *preauth_list;
+    int preauth_list_length;
+    krb5_data *salt;
+} krb5_get_init_creds_opt;
+
+#define krb5_princ_realm(context, princ) (&(princ)->realm)
+#ifndef _KERNEL
+#define krb5_x(ptr,args) ((ptr)?((*(ptr)) args):(abort(),1))
+#else
+#define krb5_x(ptr,args) ((*(ptr)) args)
+#endif
+
+#define krb5_cc_initialize(context, cache, principal) krb5_x((cache)->ops->init,(context, cache, principal))
+#define krb5_cc_store_cred(context, cache, creds) krb5_x((cache)->ops->store,(context, cache, creds))
+#define krb5_cc_destroy(context, cache) krb5_x((cache)->ops->destroy,(context, cache))
+
+#define krb5_kt_end_seq_get(context, keytab, cursor) krb5_x((keytab)->ops->end_get,(context, keytab, cursor))
+#define krb5_kt_start_seq_get(context, keytab, cursor) krb5_x((keytab)->ops->start_seq_get,(context, keytab, cursor))
+#define krb5_kt_next_entry(context, keytab, entry, cursor) krb5_x((keytab)->ops->get_next,(context, keytab, entry, cursor))
+#define krb5_kt_close(context, keytab) krb5_x((keytab)->ops->close,(context, keytab))
+
+krb5_error_code KRB5_CALLCONV krb5_init_context
+        KRB5_PROTOTYPE((krb5_context *));
+void KRB5_CALLCONV krb5_free_context
+        KRB5_PROTOTYPE((krb5_context));
+
+void KRB5_CALLCONV
+krb5_get_init_creds_opt_init
+KRB5_PROTOTYPE((krb5_get_init_creds_opt *opt));
+
+krb5_error_code KRB5_CALLCONV krb5_kt_default_name
+        KRB5_PROTOTYPE((krb5_context,
+                char *,
+                int ));
+
+krb5_error_code KRB5_CALLCONV krb5_kt_resolve
+        KRB5_PROTOTYPE((krb5_context,
+                krb5_const char *,
+                krb5_keytab * ));
+
+krb5_error_code KRB5_CALLCONV krb5_copy_principal
+        KRB5_PROTOTYPE((krb5_context,
+                krb5_const_principal,
+                krb5_principal *));
+
+krb5_error_code KRB5_CALLCONV krb5_unparse_name
+        KRB5_PROTOTYPE((krb5_context,
+                   krb5_const_principal,
+                   char * * ));
+krb5_error_code KRB5_CALLCONV krb5_kt_free_entry
+        KRB5_PROTOTYPE((krb5_context,
+                krb5_keytab_entry * ));
+
+krb5_error_code KRB5_CALLCONV krb5_cc_resolve
+        KRB5_PROTOTYPE((krb5_context,
+                   const char *,
+                   krb5_ccache * ));
+
+krb5_error_code KRB5_CALLCONV
+krb5_get_init_creds_keytab
+KRB5_PROTOTYPE((krb5_context context,
+                krb5_creds *creds,
+                krb5_principal client,
+                krb5_keytab arg_keytab,
+                krb5_deltat start_time,
+                char *in_tkt_service,
+                krb5_get_init_creds_opt *options));
+
+void KRB5_CALLCONV krb5_free_principal
+        KRB5_PROTOTYPE((krb5_context, krb5_principal ));
+
+krb5_error_code KRB5_CALLCONV krb5_sname_to_principal
+        KRB5_PROTOTYPE((krb5_context,
+                krb5_const char *,
+                   krb5_const char *,
+                   krb5_int32,
+                   krb5_principal *));
+
+krb5_error_code KRB5_CALLCONV krb5_get_credentials
+        KRB5_PROTOTYPE((krb5_context,
+                   krb5_const krb5_flags,
+                   krb5_ccache,
+                   krb5_creds *,
+                   krb5_creds * *));
+
+void KRB5_CALLCONV krb5_free_creds
+        KRB5_PROTOTYPE((krb5_context, krb5_creds *));
+
+krb5_error_code KRB5_CALLCONV krb5_parse_name
+        KRB5_PROTOTYPE((krb5_context,
+                   krb5_const char *,
+                   krb5_principal * ));
+
+#ifndef HAVE_GET_INIT_CREDS_KEYTAB
+typedef unsigned int krb5_msgtype;
+
+/* pre-authentication data */
+typedef struct _krb5_pa_data {
+    krb5_magic magic;
+    krb5_preauthtype  pa_type;
+    unsigned int length;
+    krb5_octet *contents;
+} krb5_pa_data;
+
+typedef struct _krb5_enc_data {
+    krb5_magic magic;
+    krb5_enctype enctype;
+    krb5_kvno kvno;
+    krb5_data ciphertext;
+} krb5_enc_data;
+
+/* structure for transited encoding */
+typedef struct _krb5_transited {
+    krb5_magic magic;
+    krb5_octet tr_type;
+    krb5_data tr_contents;
+} krb5_transited;
+
+typedef struct _krb5_enc_tkt_part { 
+    krb5_magic magic; 
+    /* to-be-encrypted portion */
+    krb5_flags flags;                   /* flags */
+    krb5_keyblock *session;             /* session key: includes enctype */
+    krb5_principal client;              /* client name/realm */
+    krb5_transited transited;           /* list of transited realms */
+    krb5_ticket_times times;            /* auth, start, end, renew_till */
+    krb5_address **caddrs;      /* array of ptrs to addresses */
+    krb5_authdata **authorization_data; /* auth data */
+} krb5_enc_tkt_part;
+
+typedef struct _krb5_ticket {
+    krb5_magic magic;
+    /* cleartext portion */
+    krb5_principal server;              /* server name/realm */
+    krb5_enc_data enc_part;             /* encryption type, kvno, encrypted
+                                           encoding */
+    krb5_enc_tkt_part *enc_part2;       /* ptr to decrypted version, if
+                                           available */
+} krb5_ticket;
+
+/* Last request fields */
+typedef struct _krb5_last_req_entry {
+    krb5_magic magic;
+    krb5_int32 lr_type;
+    krb5_timestamp value;
+} krb5_last_req_entry;
+
+typedef struct _krb5_enc_kdc_rep_part {
+    krb5_magic magic; 
+    /* encrypted part: */ 
+    krb5_msgtype msg_type;              /* krb5 message type */
+    krb5_keyblock *session;             /* session key */
+    krb5_last_req_entry **last_req; /* array of ptrs to entries */
+    krb5_int32 nonce;                   /* nonce from request */
+    krb5_timestamp key_exp;             /* expiration date */
+    krb5_flags flags;                   /* ticket flags */
+    krb5_ticket_times times;            /* lifetime info */
+    krb5_principal server;              /* server's principal identifier */
+    krb5_address **caddrs;      /* array of ptrs to addresses,
+                                           optional */
+} krb5_enc_kdc_rep_part;
+
+typedef struct _krb5_kdc_rep {
+    krb5_magic magic; 
+    /* cleartext part: */ 
+    krb5_msgtype msg_type;              /* AS_REP or KDC_REP? */ 
+    krb5_pa_data **padata;      /* preauthentication data from KDC */
+    krb5_principal client;              /* client's principal identifier */
+    krb5_ticket *ticket;                /* ticket */
+    krb5_enc_data enc_part;             /* encryption type, kvno, encrypted
+                                           encoding */
+    krb5_enc_kdc_rep_part *enc_part2;/* unencrypted version, if available */
+} krb5_kdc_rep;
+ 
+krb5_error_code KRB5_CALLCONV krb5_get_in_tkt_with_keytab
+        (krb5_context,
+                krb5_flags,
+                krb5_address * const *,
+                krb5_enctype *,
+                krb5_preauthtype *,
+                krb5_keytab,
+                krb5_ccache,
+                krb5_creds *,
+                krb5_kdc_rep ** );
+
+#endif
+
+#if defined(__STDC__) || defined(__cplusplus) || defined(_MSDOS) || defined(_WIN32) || defined(macintosh)
+#define ET_P(x) x
+#else
+#define ET_P(x) ()
+#endif /* __STDC__ */
+
+typedef long errcode_t;
+KRB5_DLLIMP extern const char FAR * KRB5_CALLCONV error_message
+        ET_P((errcode_t));
+
+#endif
+#else /*MIT*/
+#ifdef HAVE_GSSAPI_GSSAPI_H
+#include <gssapi/gssapi.h>
+#elif defined(HAVE_GSSAPI_H)
+#include <gssapi.h>
+#endif
+#ifdef HAVE_GSSAPI_GSSAPI_KRB5_H
+#include <gssapi/gssapi_krb5.h>
+#endif
+#ifdef HAVE_GSSAPI_GSSAPI_GENERIC_H
+#include <gssapi/gssapi_generic.h>
+#endif
+#include <krb5.h>
+#ifdef HAVE_COM_ERR_H
+#include <com_err.h>
+#endif
+#endif
+#endif
+
+])
+
+echo "configure: ## -----------------------------##"
+echo "configure: ##"
+echo "configure: ## $enable_arg has been selected"
+echo "configure: ##"
+echo "configure: ## -----------------------------##"
+
+MY_CFLAGS="-Wall -Wno-unknown-pragmas -Wextra -Werror -Wcomment -Wpointer-arith -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wdeclaration-after-statement -Wshadow"
+for ac_cv_my_cflag in $MY_CFLAGS; do
+echo "int main()
+  {
+# pragma ident "test"
+     return 0;
+  };" > conftest.c
+${CC} $ac_cv_my_cflag -c conftest.c 2>/dev/null
+res=$?
+rm -f conftest.*
+if test "$res" = "0"; then
+ CFLAGS="$CFLAGS $ac_cv_my_cflag"
+fi
+done
+
+AC_OUTPUT(Makefile)
+
+echo "configure: updating config.h"
+sed -e "s/|MAIL|/"$PACKAGE_BUGREPORT"/" config.h > .config.h.tmp
+mv .config.h.tmp config.h

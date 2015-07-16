@@ -1,0 +1,747 @@
+/* config.h.in.  Generated from configure.in by autoheader.  */
+
+/*
+ * -----------------------------------------------------------------------------
+ *
+ * Author: Markus Moeller (|MAIL|)
+ *
+ * Copyright (C) 2007 Markus Moeller. All rights reserved.
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ *
+ *   As a special exemption, M Moeller gives permission to link this program
+ *   with MIT, Heimdal or other GSS/Kerberos libraries, and distribute
+ *   the resulting executable, without including the source code for
+ *   the Libraries in the source distribution.
+ *
+ * -----------------------------------------------------------------------------
+ */
+
+
+/* Define to 1 if you have the <com_err.h> header file. */
+#undef HAVE_COM_ERR_H
+
+/* Define to 1 if you have krb5_kt_free_entry declaration */
+#undef HAVE_DECL_KRB5_KT_FREE_ENTRY
+
+/* Define to 1 if you have krb5_get_init_creds_keytab */
+#undef HAVE_GET_INIT_CREDS_KEYTAB
+
+/* Define to 1 if you have the <gssapi/gssapi_generic.h> header file. */
+#undef HAVE_GSSAPI_GSSAPI_GENERIC_H
+
+/* Define to 1 if you have the <gssapi/gssapi.h> header file. */
+#undef HAVE_GSSAPI_GSSAPI_H
+
+/* Define to 1 if you have the <gssapi/gssapi_krb5.h> header file. */
+#undef HAVE_GSSAPI_GSSAPI_KRB5_H
+
+/* Define to 1 if you have the <gssapi.h> header file. */
+#undef HAVE_GSSAPI_H
+
+/* Define to 1 if you have Heimdal Kerberos */
+#undef HAVE_HEIMDAL_KERBEROS
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <krb5.h> header file. */
+#undef HAVE_KRB5_H
+
+/* Define to 1 if you have krb5_kt_free_entry */
+#undef HAVE_KRB5_KT_FREE_ENTRY
+
+/* Define to 1 if you have MEMORY: cache support */
+#undef HAVE_KRB5_MEMORY_CACHE
+
+/* Define to 1 if you have the <lber.h> header file. */
+#undef HAVE_LBER_H
+
+/* Define to 1 if you have ldapssl_client_init */
+#undef HAVE_LDAPSSL_CLIENT_INIT
+
+/* Define to 1 if you have the <ldap.h> header file. */
+#undef HAVE_LDAP_H
+
+/* Define to 1 if you have LDAP_REBINDPROC_CALLBACK */
+#undef HAVE_LDAP_REBINDPROC_CALLBACK
+
+/* Define to 1 if you have LDAP_REBIND_FUNCTION */
+#undef HAVE_LDAP_REBIND_FUNCTION
+
+/* Define to 1 if you have LDAP_REBIND_PROC */
+#undef HAVE_LDAP_REBIND_PROC
+
+/* Define to 1 if you have LDAP_SCOPE_DEFAULT */
+#undef HAVE_LDAP_SCOPE_DEFAULT
+
+/* Define to 1 if you have ldap_url_desc2str */
+#undef HAVE_LDAP_URL_DESC2STR
+
+/* Define to 1 if you have LDAPURLDesc.lud_scheme */
+#undef HAVE_LDAP_URL_LUD_SCHEME
+
+/* Define to 1 if you have ldap_url_parse */
+#undef HAVE_LDAP_URL_PARSE
+
+/* Define to 1 if you have the `mech_krb5' library (-lmech_krb5). */
+#undef HAVE_LIBMECH_KRB5
+
+/* Define to 1 if you have the `sasl2' library (-lsasl2). */
+#undef HAVE_LIBSASL2
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have MIT Kerberos */
+#undef HAVE_MIT_KERBEROS
+
+/* Define to 1 if you have NAS Kerberos */
+#undef HAVE_NAS_KERBEROS
+
+/* Define to 1 if you have New Solaris 10/OpenSolaris Kerberos */
+#undef HAVE_NEW_SEAM_KERBEROS
+
+/* Define to 1 if you have Openldap */
+#undef HAVE_OPENLDAP
+
+/* Define to 1 if Mac Darwin without sasl.h */
+#undef HAVE_SASL_DARWIN
+
+/* Define to 1 if you have the <sasl.h> header file. */
+#undef HAVE_SASL_H
+
+/* Define to 1 if you have the <sasl/sasl.h> header file. */
+#undef HAVE_SASL_SASL_H
+
+/* Define to 1 if you have SEAM Kerberos */
+#undef HAVE_SEAM_KERBEROS
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have Sun ldap sdk */
+#undef HAVE_SUN_LDAP_SDK
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* The size of `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+
+#ifdef HAVE_HEIMDAL_KERBEROS
+#ifdef HAVE_GSSAPI_GSSAPI_H
+#include <gssapi/gssapi.h>
+#elif defined(HAVE_GSSAPI_H)
+#include <gssapi.h>
+#endif
+#include <krb5.h>
+#ifdef HAVE_COM_ERR_H
+#include <com_err.h>
+#else
+#define error_message(code) krb5_get_err_text(kparam.context,code)
+#endif
+#define gss_nt_service_name GSS_C_NT_HOSTBASED_SERVICE
+#else
+#ifdef HAVE_SEAM_KERBEROS
+#ifdef HAVE_GSSAPI_GSSAPI_H
+#include <gssapi/gssapi.h>
+#elif defined(HAVE_GSSAPI_H)
+#include <gssapi.h>
+#endif
+#ifdef HAVE_GSSAPI_GSSAPI_EXT_H
+#include <gssapi/gssapi_ext.h>
+#endif
+#define gss_nt_service_name GSS_C_NT_HOSTBASED_SERVICE
+#ifdef HAVE_KRB5_H
+/* still testing this for OpenSolaris
+Source includes are located in:
+/usr/src/uts/common/gssapi/mechs/krb5/include/
+and
+/usr/src/lib/gss_mechs/mech_krb5/include
+or
+/usr/include/kerberosv5
+*/
+#include <krb5.h>
+#ifdef HAVE_COM_ERR_H
+#include <com_err.h>
+#endif
+#else /* HAVE_KRB5_H */
+#ifndef KRB5_CONFIG__
+#ifndef KRB5_CALLCONV
+#define KRB5_CALLCONV
+#define KRB5_CALLCONV_C
+#define KRB5_DLLIMP
+#define GSS_DLLIMP
+#define KRB5_EXPORTVAR
+#define NEAR
+#define FAR
+#endif /* !KRB5_CALLCONV */
+#endif /* !KRB5_CONFIG__ */
+
+
+typedef unsigned char   krb5_octet;
+
+#if (SIZEOF_INT == 4)
+typedef int             krb5_int32;
+typedef unsigned int    krb5_ui_4;
+#define VALID_INT_BITS    0x7fffffff
+#define VALID_UINT_BITS   0xffffffff
+#elif (SIZEOF_LONG == 4)
+typedef long    krb5_int32;
+typedef unsigned long   krb5_ui_4;
+#elif (SIZEOF_SHORT == 4)
+typedef short   krb5_int32;
+typedef unsigned short  krb5_ui_4;
+#else
+ ?== error: undefined 32 bit type
+#endif
+
+#if defined(KRB5_NO_CONST) || (defined(__ultrix) && !defined(__GNUC__))
+#define krb5_const
+#else
+#define krb5_const const
+#endif
+
+#if defined(__STDC__) || defined(__cplusplus) || defined(HAS_VOID_TYPE)
+typedef void * krb5_pointer;
+typedef void krb5_const * krb5_const_pointer;
+#else
+typedef char * krb5_pointer;
+typedef char krb5_const * krb5_const_pointer;
+#endif
+
+#if (defined(__STDC__) || defined(__cplusplus) || defined(_MSDOS) || defined(_WIN32) || defined(KRB5_PROVIDE_PROTOTYPES)) && !defined(KRB5_NO_PROTOTYPES)
+#define KRB5_PROTOTYPE(x) x
+#if defined(__STDC__) || defined(__cplusplus) || defined(HAVE_STDARG_H) || defined(_MSDOS) || defined(_WIN32)
+#define KRB5_STDARG_P(x) x
+#else
+#define KRB5_STDARG_P(x) ()
+#endif /* defined(__STDC__) || defined(__cplusplus) || defined(HAVE_STDARG_H) */
+#else
+#define KRB5_PROTOTYPE(x) ()
+#define KRB5_STDARG_P(x) ()
+#endif /* STDC or PROTOTYPES */
+
+/*
+ * This gross compiler dependency is in here because the stock Ultrix
+ * compiler defines __STDC__ but doesn't deal with nested prototypes
+ * properly.  The reason this isn't tested for is so that this header
+ * is actually useful when installed.
+ */
+#if defined(KRB5_NO_NESTED_PROTOTYPES) || (defined(__ultrix) && !defined(__GNUC__))
+#define KRB5_NPROTOTYPE(x) ()
+#else
+#define KRB5_NPROTOTYPE(x) KRB5_PROTOTYPE(x)
+#endif
+
+#define KRB5_NT_UNKNOWN         0
+
+#define KRB5_KT_END                              (-1765328202L)
+
+struct _krb5_context;
+typedef struct _krb5_context * krb5_context;
+
+typedef unsigned int krb5_boolean;
+typedef unsigned int krb5_kvno;
+
+typedef krb5_int32      krb5_authdatatype;
+typedef krb5_int32      krb5_addrtype;
+typedef krb5_int32      krb5_timestamp;
+typedef krb5_int32      krb5_keyusage;
+typedef krb5_int32      krb5_flags;
+typedef krb5_int32      krb5_enctype;
+typedef krb5_int32      krb5_error_code;
+typedef krb5_int32      krb5_deltat;
+typedef krb5_int32      krb5_preauthtype; /* This may change, later on */
+
+typedef krb5_error_code krb5_magic;
+
+typedef struct _krb5_data {
+    krb5_magic magic;
+    unsigned int length;
+    char *data;
+} krb5_data;
+
+typedef krb5_pointer    krb5_cc_cursor; /* cursor for sequential lookup */
+
+struct _krb5_keyblock;
+
+typedef struct _dk_node {
+    krb5_keyusage   usage;
+    struct _krb5_keyblock   *derived_key;
+    uchar_t         dkid; /* derived key identifier byte */
+    struct _dk_node *next;
+} krb5_dk_node;
+
+#ifdef HAVE_NEW_SEAM_KERBEROS
+typedef unsigned long int CK_ULONG;
+typedef CK_ULONG          CK_OBJECT_HANDLE;
+#endif /* HAVE_NEW_SEAM_KERBEROS */
+
+typedef struct _krb5_keyblock {
+    krb5_magic magic;
+    krb5_enctype enctype;
+    unsigned int length;
+    krb5_octet *contents;
+#ifdef HAVE_NEW_SEAM_KERBEROS
+    krb5_dk_node   *dk_list; /* list of keys derived from this key */
+#ifdef _KERNEL
+    crypto_mech_type_t     kef_mt;
+    crypto_key_t           kef_key;
+    crypto_ctx_template_t  key_tmpl;
+#else
+    CK_OBJECT_HANDLE       hKey; /* PKCS#11 key object handle */
+    pid_t       pid; /* fork safety */
+#endif /* _KERNEL */
+#endif /* HAVE_NEW_SEAM_KERBEROS */
+} krb5_keyblock;
+
+typedef struct krb5_principal_data {
+    krb5_magic magic;
+    krb5_data realm;
+    krb5_data *data;            /* An array of strings */
+    krb5_int32 length;
+    krb5_int32 type;
+} krb5_principal_data;
+
+typedef krb5_principal_data * krb5_principal;
+
+typedef krb5_const krb5_principal_data *krb5_const_principal;
+
+typedef struct _krb5_ticket_times {
+    krb5_timestamp authtime; /* XXX ? should ktime in KDC_REP == authtime
+                                in ticket? otherwise client can't get this */
+    krb5_timestamp starttime;           /* optional in ticket, if not present,
+                                           use authtime */
+    krb5_timestamp endtime;
+    krb5_timestamp renew_till;
+} krb5_ticket_times;
+
+/* structure for address */
+typedef struct _krb5_address {
+    krb5_magic magic;
+    krb5_addrtype addrtype;
+    unsigned int length;
+    krb5_octet *contents;
+} krb5_address;
+
+/* structure for auth data */
+typedef struct _krb5_authdata {
+    krb5_magic magic;
+    krb5_authdatatype ad_type;
+    unsigned int length;
+    krb5_octet *contents;
+} krb5_authdata;
+
+/* credentials:  Ticket, session key, etc. */
+typedef struct _krb5_creds {
+    krb5_magic magic;
+    krb5_principal client;              /* client's principal identifier */
+    krb5_principal server;              /* server's principal identifier */
+    krb5_keyblock keyblock;             /* session encryption key info */
+    krb5_ticket_times times;            /* lifetime info */
+    krb5_boolean is_skey;               /* true if ticket is encrypted in
+                                           another ticket's skey */
+    krb5_flags ticket_flags;            /* flags in ticket */
+    krb5_address * *addresses;  /* addrs in ticket */
+    krb5_data ticket;                   /* ticket string itself */
+    krb5_data second_ticket;            /* second ticket, if related to
+                                           ticket (via DUPLICATE-SKEY or
+                                           ENC-TKT-IN-SKEY) */
+    krb5_authdata * *authdata;  /* authorization data */
+} krb5_creds;
+
+typedef struct _krb5_ccache {
+    krb5_magic magic;
+    struct _krb5_cc_ops *ops;
+    krb5_pointer data;
+} *krb5_ccache;
+
+typedef struct _krb5_cc_ops {
+    krb5_magic magic;
+    char *prefix;
+    char * (KRB5_CALLCONV *get_name) KRB5_NPROTOTYPE((krb5_context, krb5_ccache));
+    krb5_error_code (KRB5_CALLCONV *resolve) KRB5_NPROTOTYPE((krb5_context, krb5_ccache *,
+                                            const char *));
+    krb5_error_code (KRB5_CALLCONV *gen_new) KRB5_NPROTOTYPE((krb5_context, krb5_ccache *));
+    krb5_error_code (KRB5_CALLCONV *init) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_principal));
+    krb5_error_code (KRB5_CALLCONV *destroy) KRB5_NPROTOTYPE((krb5_context, krb5_ccache));
+    krb5_error_code (KRB5_CALLCONV *close) KRB5_NPROTOTYPE((krb5_context, krb5_ccache));
+    krb5_error_code (KRB5_CALLCONV *store) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_creds *));
+    krb5_error_code (KRB5_CALLCONV *retrieve) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_flags, krb5_creds *,
+                                            krb5_creds *));
+    krb5_error_code (KRB5_CALLCONV *get_princ) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_principal *));
+    krb5_error_code (KRB5_CALLCONV *get_first) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_cc_cursor *));
+    krb5_error_code (KRB5_CALLCONV *get_next) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_cc_cursor *, krb5_creds *));
+    krb5_error_code (KRB5_CALLCONV *end_get) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_cc_cursor *));
+    krb5_error_code (KRB5_CALLCONV *remove_cred) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_flags, krb5_creds *));
+    krb5_error_code (KRB5_CALLCONV *set_flags) KRB5_NPROTOTYPE((krb5_context, krb5_ccache,
+                                            krb5_flags));
+} krb5_cc_ops;
+
+
+
+typedef krb5_pointer krb5_kt_cursor;    /* XXX */
+
+typedef struct krb5_keytab_entry_st {
+    krb5_magic magic;
+    krb5_principal principal;   /* principal of this key */
+    krb5_timestamp timestamp;   /* time entry written to keytable */
+    krb5_kvno vno;              /* key version number */
+    krb5_keyblock key;          /* the secret key */
+} krb5_keytab_entry;
+
+typedef struct _krb5_kt {
+    krb5_magic magic;
+    struct _krb5_kt_ops *ops;
+    krb5_pointer data;
+} *krb5_keytab;
+
+
+typedef struct _krb5_kt_ops {
+    krb5_magic magic;
+    char *prefix;
+    /* routines always present */
+    krb5_error_code (KRB5_CALLCONV *resolve)
+        (krb5_context,
+                    krb5_const char *,
+                    krb5_keytab *);
+    krb5_error_code (KRB5_CALLCONV *get_name)
+        (krb5_context,
+                    krb5_keytab,
+                    char *,
+                    int);
+    krb5_error_code (KRB5_CALLCONV *close)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab));
+    krb5_error_code (KRB5_CALLCONV *get)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_const_principal,
+                    krb5_kvno,
+                    krb5_enctype,
+                    krb5_keytab_entry *));
+    krb5_error_code (KRB5_CALLCONV *start_seq_get)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_kt_cursor *));
+    krb5_error_code (KRB5_CALLCONV *get_next)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_keytab_entry *,
+                    krb5_kt_cursor *));
+    krb5_error_code (KRB5_CALLCONV *end_get)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_kt_cursor *));
+    /* routines to be included on extended version (write routines) */
+    krb5_error_code (KRB5_CALLCONV *add)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                    krb5_keytab_entry *));
+    krb5_error_code (KRB5_CALLCONV *remove)
+        KRB5_NPROTOTYPE((krb5_context,
+                    krb5_keytab,
+                  krb5_keytab_entry *));
+
+    /* Handle for serializer */
+    void * serializer;
+} krb5_kt_ops;
+
+typedef struct _krb5_get_init_creds_opt {
+    krb5_flags flags;
+    krb5_deltat tkt_life;
+    krb5_deltat renew_life;
+    int forwardable;
+    int proxiable;
+    krb5_enctype *etype_list;
+    int etype_list_length;
+    krb5_address **address_list;
+    krb5_preauthtype *preauth_list;
+    int preauth_list_length;
+    krb5_data *salt;
+} krb5_get_init_creds_opt;
+
+#define krb5_princ_realm(context, princ) (&(princ)->realm)
+#ifndef _KERNEL
+#define krb5_x(ptr,args) ((ptr)?((*(ptr)) args):(abort(),1))
+#else
+#define krb5_x(ptr,args) ((*(ptr)) args)
+#endif
+
+#define krb5_cc_initialize(context, cache, principal) krb5_x((cache)->ops->init,(context, cache, principal))
+#define krb5_cc_store_cred(context, cache, creds) krb5_x((cache)->ops->store,(context, cache, creds))
+#define krb5_cc_destroy(context, cache) krb5_x((cache)->ops->destroy,(context, cache))
+
+#define krb5_kt_end_seq_get(context, keytab, cursor) krb5_x((keytab)->ops->end_get,(context, keytab, cursor))
+#define krb5_kt_start_seq_get(context, keytab, cursor) krb5_x((keytab)->ops->start_seq_get,(context, keytab, cursor))
+#define krb5_kt_next_entry(context, keytab, entry, cursor) krb5_x((keytab)->ops->get_next,(context, keytab, entry, cursor))
+#define krb5_kt_close(context, keytab) krb5_x((keytab)->ops->close,(context, keytab))
+
+krb5_error_code KRB5_CALLCONV krb5_init_context
+        KRB5_PROTOTYPE((krb5_context *));
+void KRB5_CALLCONV krb5_free_context
+        KRB5_PROTOTYPE((krb5_context));
+
+void KRB5_CALLCONV
+krb5_get_init_creds_opt_init
+KRB5_PROTOTYPE((krb5_get_init_creds_opt *opt));
+
+krb5_error_code KRB5_CALLCONV krb5_kt_default_name
+        KRB5_PROTOTYPE((krb5_context,
+                char *,
+                int ));
+
+krb5_error_code KRB5_CALLCONV krb5_kt_resolve
+        KRB5_PROTOTYPE((krb5_context,
+                krb5_const char *,
+                krb5_keytab * ));
+
+krb5_error_code KRB5_CALLCONV krb5_copy_principal
+        KRB5_PROTOTYPE((krb5_context,
+                krb5_const_principal,
+                krb5_principal *));
+
+krb5_error_code KRB5_CALLCONV krb5_unparse_name
+        KRB5_PROTOTYPE((krb5_context,
+                   krb5_const_principal,
+                   char * * ));
+krb5_error_code KRB5_CALLCONV krb5_kt_free_entry
+        KRB5_PROTOTYPE((krb5_context,
+                krb5_keytab_entry * ));
+
+krb5_error_code KRB5_CALLCONV krb5_cc_resolve
+        KRB5_PROTOTYPE((krb5_context,
+                   const char *,
+                   krb5_ccache * ));
+
+krb5_error_code KRB5_CALLCONV
+krb5_get_init_creds_keytab
+KRB5_PROTOTYPE((krb5_context context,
+                krb5_creds *creds,
+                krb5_principal client,
+                krb5_keytab arg_keytab,
+                krb5_deltat start_time,
+                char *in_tkt_service,
+                krb5_get_init_creds_opt *options));
+
+void KRB5_CALLCONV krb5_free_principal
+        KRB5_PROTOTYPE((krb5_context, krb5_principal ));
+
+krb5_error_code KRB5_CALLCONV krb5_sname_to_principal
+        KRB5_PROTOTYPE((krb5_context,
+                krb5_const char *,
+                   krb5_const char *,
+                   krb5_int32,
+                   krb5_principal *));
+
+krb5_error_code KRB5_CALLCONV krb5_get_credentials
+        KRB5_PROTOTYPE((krb5_context,
+                   krb5_const krb5_flags,
+                   krb5_ccache,
+                   krb5_creds *,
+                   krb5_creds * *));
+
+void KRB5_CALLCONV krb5_free_creds
+        KRB5_PROTOTYPE((krb5_context, krb5_creds *));
+
+krb5_error_code KRB5_CALLCONV krb5_parse_name
+        KRB5_PROTOTYPE((krb5_context,
+                   krb5_const char *,
+                   krb5_principal * ));
+
+#ifndef HAVE_GET_INIT_CREDS_KEYTAB
+typedef unsigned int krb5_msgtype;
+
+/* pre-authentication data */
+typedef struct _krb5_pa_data {
+    krb5_magic magic;
+    krb5_preauthtype  pa_type;
+    unsigned int length;
+    krb5_octet *contents;
+} krb5_pa_data;
+
+typedef struct _krb5_enc_data {
+    krb5_magic magic;
+    krb5_enctype enctype;
+    krb5_kvno kvno;
+    krb5_data ciphertext;
+} krb5_enc_data;
+
+/* structure for transited encoding */
+typedef struct _krb5_transited {
+    krb5_magic magic;
+    krb5_octet tr_type;
+    krb5_data tr_contents;
+} krb5_transited;
+
+typedef struct _krb5_enc_tkt_part { 
+    krb5_magic magic; 
+    /* to-be-encrypted portion */
+    krb5_flags flags;                   /* flags */
+    krb5_keyblock *session;             /* session key: includes enctype */
+    krb5_principal client;              /* client name/realm */
+    krb5_transited transited;           /* list of transited realms */
+    krb5_ticket_times times;            /* auth, start, end, renew_till */
+    krb5_address **caddrs;      /* array of ptrs to addresses */
+    krb5_authdata **authorization_data; /* auth data */
+} krb5_enc_tkt_part;
+
+typedef struct _krb5_ticket {
+    krb5_magic magic;
+    /* cleartext portion */
+    krb5_principal server;              /* server name/realm */
+    krb5_enc_data enc_part;             /* encryption type, kvno, encrypted
+                                           encoding */
+    krb5_enc_tkt_part *enc_part2;       /* ptr to decrypted version, if
+                                           available */
+} krb5_ticket;
+
+/* Last request fields */
+typedef struct _krb5_last_req_entry {
+    krb5_magic magic;
+    krb5_int32 lr_type;
+    krb5_timestamp value;
+} krb5_last_req_entry;
+
+typedef struct _krb5_enc_kdc_rep_part {
+    krb5_magic magic; 
+    /* encrypted part: */ 
+    krb5_msgtype msg_type;              /* krb5 message type */
+    krb5_keyblock *session;             /* session key */
+    krb5_last_req_entry **last_req; /* array of ptrs to entries */
+    krb5_int32 nonce;                   /* nonce from request */
+    krb5_timestamp key_exp;             /* expiration date */
+    krb5_flags flags;                   /* ticket flags */
+    krb5_ticket_times times;            /* lifetime info */
+    krb5_principal server;              /* server's principal identifier */
+    krb5_address **caddrs;      /* array of ptrs to addresses,
+                                           optional */
+} krb5_enc_kdc_rep_part;
+
+typedef struct _krb5_kdc_rep {
+    krb5_magic magic; 
+    /* cleartext part: */ 
+    krb5_msgtype msg_type;              /* AS_REP or KDC_REP? */ 
+    krb5_pa_data **padata;      /* preauthentication data from KDC */
+    krb5_principal client;              /* client's principal identifier */
+    krb5_ticket *ticket;                /* ticket */
+    krb5_enc_data enc_part;             /* encryption type, kvno, encrypted
+                                           encoding */
+    krb5_enc_kdc_rep_part *enc_part2;/* unencrypted version, if available */
+} krb5_kdc_rep;
+ 
+krb5_error_code KRB5_CALLCONV krb5_get_in_tkt_with_keytab
+        (krb5_context,
+                krb5_flags,
+                krb5_address * const *,
+                krb5_enctype *,
+                krb5_preauthtype *,
+                krb5_keytab,
+                krb5_ccache,
+                krb5_creds *,
+                krb5_kdc_rep ** );
+
+#endif
+
+#if defined(__STDC__) || defined(__cplusplus) || defined(_MSDOS) || defined(_WIN32) || defined(macintosh)
+#define ET_P(x) x
+#else
+#define ET_P(x) ()
+#endif /* __STDC__ */
+
+typedef long errcode_t;
+KRB5_DLLIMP extern const char FAR * KRB5_CALLCONV error_message
+        ET_P((errcode_t));
+
+#endif
+#else /*MIT*/
+#ifdef HAVE_GSSAPI_GSSAPI_H
+#include <gssapi/gssapi.h>
+#elif defined(HAVE_GSSAPI_H)
+#include <gssapi.h>
+#endif
+#ifdef HAVE_GSSAPI_GSSAPI_KRB5_H
+#include <gssapi/gssapi_krb5.h>
+#endif
+#ifdef HAVE_GSSAPI_GSSAPI_GENERIC_H
+#include <gssapi/gssapi_generic.h>
+#endif
+#include <krb5.h>
+#ifdef HAVE_COM_ERR_H
+#include <com_err.h>
+#endif
+#endif
+#endif
+
+
