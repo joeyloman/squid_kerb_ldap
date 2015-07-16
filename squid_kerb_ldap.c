@@ -51,6 +51,7 @@ void init_args(struct main_args *margs) {
   margs->AD=0;
   margs->mdepth=5;
   margs->ddomain=NULL;
+  margs->pname=NULL;
   margs->groups=NULL;
   margs->ndoms=NULL;
   margs->lservs=NULL;
@@ -192,6 +193,10 @@ void clean_args(struct main_args *margs) {
       free(margs->ddomain);
       margs->ddomain=NULL;
   }
+  if (margs->pname) {
+      free(margs->pname);
+      margs->pname=NULL;
+  }
   if (margs->groups) {
       clean_gd(margs->groups);
       margs->groups=NULL;
@@ -222,7 +227,7 @@ int main (int argc, char * const argv[]) {
   
   init_args(&margs);
 
-  while (-1 != (opt = getopt(argc, argv, "diasg:D:N:S:u:U:t:T:p:l:b:m:h"))) {
+  while (-1 != (opt = getopt(argc, argv, "diasg:D:P:N:S:u:U:t:T:p:l:b:m:h"))) {
     switch (opt) {
     case 'd':
       margs.debug = 1;
@@ -241,6 +246,9 @@ int main (int argc, char * const argv[]) {
       break;
     case 'D':
       margs.ddomain = strdup(optarg);
+      break;
+    case 'P':
+      margs.pname = strdup(optarg);
       break;
     case 'N':
       margs.nlist = strdup(optarg);
@@ -276,7 +284,7 @@ int main (int argc, char * const argv[]) {
       break;
     case 'h':
       fprintf(stderr, "Usage: \n");
-      fprintf(stderr, "squid_kerb_ldap [-d] [-i] -g group list [-D domain] [-N netbios domain map] [-s] [-u ldap user] [-p ldap user password] [-l ldap url] [-b ldap bind path] [-a] [-m max depth] [-h]\n");
+      fprintf(stderr, "squid_kerb_ldap [-d] [-i] -g group list [-D domain] [-N netbios domain map] [-P principal name] [-s] [-u ldap user] [-p ldap user password] [-l ldap url] [-b ldap bind path] [-a] [-m max depth] [-h]\n");
       fprintf(stderr, "-d full debug\n");
       fprintf(stderr, "-i informational messages\n");
       fprintf(stderr, "-g group list\n");
@@ -284,6 +292,7 @@ int main (int argc, char * const argv[]) {
       fprintf(stderr, "-T group list (all in hex UTF-8 format - except seperator @)\n");
       fprintf(stderr, "-D default domain\n");
       fprintf(stderr, "-N netbios to dns domain map\n");
+      fprintf(stderr, "-P principal name for authentication\n");
       fprintf(stderr, "-S ldap server to dns domain map\n");
       fprintf(stderr, "-u ldap user\n");
       fprintf(stderr, "-p ldap user password\n");
@@ -397,6 +406,10 @@ int main (int argc, char * const argv[]) {
       domain=strdup(margs.ddomain);
       if (margs.debug || margs.log)
         fprintf(stderr, "%s| %s: Got User: %s set default domain: %s\n",LogTime(), PROGRAM,user,domain);
+    }
+    if (margs.pname) {
+      if (margs.debug || margs.log)
+        fprintf(stderr, "%s| %s: Got Principal: %s\n",LogTime(), PROGRAM,margs.pname);
     }
     if (margs.debug || margs.log)
       fprintf(stderr, "%s| %s: Got User: %s Domain: %s\n",LogTime(), PROGRAM,user,domain?domain:"NULL");

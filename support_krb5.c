@@ -118,6 +118,24 @@ int krb5_create_cache(struct main_args *margs,char *domain) {
 #else
 	    fprintf(stderr, "%s| %s: Keytab entry has realm name: %s\n", LogTime(), PROGRAM, krb5_princ_realm(kparam.context, entry.principal)->data);
 #endif
+
+        if (margs->pname)
+        {
+            code = krb5_unparse_name(kparam.context, entry.principal, &principal_name);
+            if (code)
+            {
+                fprintf(stderr, "%s| %s: Error while unparsing principal name : %s\n", LogTime(), PROGRAM, error_message(code));
+            } else {
+                if (margs->debug)
+                    fprintf(stderr, "%s| %s: Found principal name: %s\n", LogTime(), PROGRAM, principal_name);
+            }
+
+            if(!strcmp(principal_name,margs->pname))
+            {
+                fprintf(stderr, "%s| %s: Principal match found, using: %s for authentication\n", LogTime(), PROGRAM, principal_name);
+                found=1;
+            }
+        } else {
 #ifdef HAVE_HEIMDAL_KERBEROS
 	    if (!strcasecmp(domain, entry.principal->realm))
 #else
@@ -134,6 +152,7 @@ int krb5_create_cache(struct main_args *margs,char *domain) {
 		    found=1;
                 }
 	    }
+        }
 #if defined(HAVE_HEIMDAL_KERBEROS) || ( defined(HAVE_KRB5_KT_FREE_ENTRY) && HAVE_DECL_KRB5_KT_FREE_ENTRY==1)
 	code = krb5_kt_free_entry(kparam.context,&entry);
 #else
@@ -147,6 +166,17 @@ int krb5_create_cache(struct main_args *margs,char *domain) {
         }
         if (found) 
             break;
+    }
+
+    if (!found)
+    {
+        if (margs->pname)
+            fprintf(stderr, "%s| %s: Error no principal name found matching principal name argument: %s!\n", LogTime(), PROGRAM, margs->pname);
+        else
+            fprintf(stderr, "%s| %s: Error no valid principal name found!\n", LogTime(), PROGRAM);
+
+        retval=1;
+        goto cleanup;
     }
 
     if (code && code != KRB5_KT_END) 

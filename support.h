@@ -74,6 +74,7 @@ struct main_args {
   int   AD;
   int   mdepth;
   char* ddomain;
+  char* pname;
   struct gdstruct *groups;
   struct ndstruct *ndoms;
   struct lsstruct *lservs;
